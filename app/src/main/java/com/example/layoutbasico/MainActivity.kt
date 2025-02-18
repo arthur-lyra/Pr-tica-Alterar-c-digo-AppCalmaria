@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -48,11 +49,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.layoutbasico.ui.theme.LayoutBasicoTheme
 
 class MainActivity : ComponentActivity() {
@@ -303,7 +311,7 @@ private fun AlignYourBodyRow(
 
 // Navegacao
  @Composable
-private fun BarraNavegacao(modifier: Modifier = Modifier) {
+private fun BarraNavegacao(navController: NavController,modifier: Modifier = Modifier) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         modifier = modifier
@@ -318,8 +326,8 @@ private fun BarraNavegacao(modifier: Modifier = Modifier) {
             label = {
                 Text(stringResource(R.string.bottom_navigation_home))
             },
-            selected = true,
-            onClick = {}
+            selected = navController.currentBackStackEntry?.destination?.route == "home",
+            onClick = {navController.navigate("home")}
         )
         NavigationBarItem(
             icon = {
@@ -331,29 +339,61 @@ private fun BarraNavegacao(modifier: Modifier = Modifier) {
             label = {
                 Text(stringResource(R.string.bottom_navigation_profile))
             },
-            selected = false,
-            onClick = {}
+            selected = navController.currentBackStackEntry?.destination?.route == "profile",
+            onClick = {navController.navigate("profile")}
         )
     }
 }
+ @Composable
+ fun ProfileScreen() {
+     Column(
+         modifier = Modifier
+             .fillMaxSize()
+             .padding(16.dp),
+         horizontalAlignment = Alignment.CenterHorizontally,
+         verticalArrangement = Arrangement.Center
+     ) {
+         Image(
+             painter = painterResource(id = R.drawable.terry),
+             contentDescription = "Ícone de Perfil",
+             modifier = Modifier.size(100.dp)
+         )
+         Spacer(modifier = Modifier.height(16.dp))
+         Text(text = "Nome: Julius Rock", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+         Spacer(modifier = Modifier.height(8.dp))
+         Text(text = "E-mail: Terry.Crews@gmail.com", fontSize = 16.sp)
+         Spacer(modifier = Modifier.height(8.dp))
+         Text(text = "Telefone: (11) 99999-9999", fontSize = 16.sp)
+         Spacer(modifier = Modifier.height(8.dp))
+         Text(text = "Membro desde: Janeiro de 1982", fontSize = 16.sp, color = Color.Gray)
+     }
+ }
 
 
-//Scaffold
+
+
+ //Scaffold
 @Composable
 fun CalmariaApp() {
+
+    val navController = rememberNavController()
+
     LayoutBasicoTheme {
         Scaffold(bottomBar = {
-            BarraNavegacao()
+            BarraNavegacao(navController = navController)
         }) {
             padding ->
-                HomeScreen(Modifier.padding(padding))
+            NavHost(
+                navController = navController,
+                startDestination = "home",
+                modifier = Modifier.padding(padding)
+            ) {
+                composable("home") { HomeScreen() }
+                composable("profile") { ProfileScreen() }
+            }
         }
     }
 }
-
-
-
-
 
 
  private val alignYourBodyData = listOf(
